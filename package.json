@@ -4,6 +4,10 @@
   "description": "Minimalistic 3D game engine for web browsers",
   "main": "dist/index.js",
   "type": "module",
+  "files": [
+    "dist/index.js",
+    "README.md"
+  ],
   "scripts": {
     "preinstall": "node scripts/pre-install.js",
     "build": "node scripts/check-deps.js && node scripts/build.js",
@@ -12,7 +16,9 @@
     "deps": "node scripts/check-deps.js"
   },
   "keywords": ["game-engine", "webgl", "3d"],
-  "author": "",
+  "author": "mirror12k",
+  "repository": { "url": "git+https://github.com/mirror12k/uap-game-engine.git" },
+  "homepage": "https://github.com/mirror12k/uap-game-engine",
   "license": "MIT",
   "dependencies": {
     "gl-matrix": "^3.4.3"

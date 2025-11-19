@@ -5,9 +5,9 @@ Minimalistic 3D game engine for web browsers. Built for simplicity, performance,
 ## Quick Start
 
 ```bash
-make install
-make build
-make server
+npm install
+npm run build
+npm run server
 ```
 
 Open http://localhost:8080/dist/demo1.html
@@ -50,12 +50,30 @@ game.start();
 
 ## Commands
 
-- `make install` - Install dependencies (validates limit)
-- `make build` - Build library and demos (validates limit)
-- `make test` - Run test suite
-- `make deps` - Check dependency count and list all deps
-- `make server` - Start development server
-- `make clean` - Remove build artifacts
+- `npm install` - Install dependencies (validates limit)
+- `npm run build` - Build library and demos (validates limit)
+- `npm test` - Run test suite
+- `npm run deps` - Check dependency count and list all deps
+- `npm run server` - Start development server
+
+## Publishing to NPM
+
+First-time setup:
+```bash
+npm login
+```
+
+Before publishing:
+1. Update version: `npm version [patch|minor|major]`
+2. Run tests: `npm test`
+3. Build: `npm run build`
+
+Publish:
+```bash
+npm publish
+```
+
+The `files` field in package.json ensures only `dist/index.js` and `README.md` are published, keeping the package minimal.
 
 ## Demos
 

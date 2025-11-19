@@ -1,0 +1,41 @@
+import { execSync } from 'child_process';
+import { existsSync } from 'fs';
+
+const demos = [
+  {
+    name: 'Spinning Triangle',
+    entry: 'demos/spinning-triangle/index.js',
+    output: 'dist/demo1.html'
+  },
+  {
+    name: 'Mouse Triangle',
+    entry: 'demos/mouse-triangle/index.js',
+    output: 'dist/demo2.html'
+  },
+  {
+    name: 'Box Room',
+    entry: 'demos/box-room/index.js',
+    output: 'dist/demo3.html'
+  }
+];
+
+console.log('\n=== Building Demos ===\n');
+
+for (const demo of demos) {
+  if (!existsSync(demo.entry)) {
+    console.log(`Skipping ${demo.name} - ${demo.entry} not found`);
+    continue;
+  }
+
+  try {
+    execSync(
+      `node bin/uap-build.js --entry ${demo.entry} --output ${demo.output} --name "${demo.name}"`,
+      { stdio: 'inherit' }
+    );
+  } catch (err) {
+    console.error(`Failed to build ${demo.name}`);
+    process.exit(1);
+  }
+}
+
+console.log('\n=== All demos built successfully ===\n');

@@ -36,50 +36,73 @@ async function buildGame(entryPoint, outputPath, gameName) {
   console.log(`Built game -> ${outputPath}`);
 }
 
-async function main() {
-  const srcDir = 'src';
-  const distDir = 'dist';
-  const entryPoint = resolve(srcDir, 'index.js');
-  const outputPath = resolve(distDir, 'index.html');
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const parsed = {};
 
-  // Ensure dist directory exists
-  if (!existsSync(distDir)) {
-    mkdirSync(distDir, { recursive: true });
-    console.log(`Created ${distDir} directory`);
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--entry' && i + 1 < args.length) {
+      parsed.entry = args[++i];
+    } else if (args[i] === '--output' && i + 1 < args.length) {
+      parsed.output = args[++i];
+    } else if (args[i] === '--name' && i + 1 < args.length) {
+      parsed.name = args[++i];
+    }
   }
 
-  // Check if src directory exists
-  if (!existsSync(srcDir)) {
-    console.error(`Error: ${srcDir} directory not found`);
-    console.error('Please create a src directory with your game files');
-    process.exit(1);
+  return parsed;
+}
+
+async function main() {
+  const args = parseArgs();
+
+  // Use CLI arguments or fall back to defaults
+  const srcDir = 'src';
+  const distDir = 'dist';
+  const entryPoint = args.entry ? resolve(args.entry) : resolve(srcDir, 'index.js');
+  const outputPath = args.output ? resolve(args.output) : resolve(distDir, 'index.html');
+
+  // Ensure output directory exists
+  const outputDir = outputPath.substring(0, outputPath.lastIndexOf('/'));
+  if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
+    console.log(`Created ${outputDir} directory`);
   }
 
   // Check if entry point exists
   if (!existsSync(entryPoint)) {
     console.error(`Error: ${entryPoint} not found`);
-    console.error('Please create a src/index.js file as the entry point for your game');
+    if (!args.entry) {
+      console.error('Please create a src/index.js file as the entry point for your game');
+    }
     process.exit(1);
   }
 
   console.log('Building game...');
 
-  // Get game name from package.json if it exists
-  let gameName = 'Game';
-  const packageJsonPath = resolve('package.json');
-  if (existsSync(packageJsonPath)) {
-    try {
-      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-      gameName = packageJson.name || 'Game';
-    } catch (e) {
-      // Ignore errors reading package.json
+  // Get game name
+  let gameName = args.name;
+  if (!gameName) {
+    // Try to get from package.json
+    const packageJsonPath = resolve('package.json');
+    if (existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+        gameName = packageJson.name || 'Game';
+      } catch (e) {
+        gameName = 'Game';
+      }
+    } else {
+      gameName = 'Game';
     }
   }
 
   await buildGame(entryPoint, outputPath, gameName);
 
   console.log('\nBuild complete!');
-  console.log(`Run "npm run server" and open http://localhost:8080/dist/index.html to view your game`);
+  if (!args.output) {
+    console.log(`Run "npm run server" and open http://localhost:8080/dist/index.html to view your game`);
+  }
 }
 
 main().catch(err => {

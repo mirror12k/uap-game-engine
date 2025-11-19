@@ -26,7 +26,16 @@ Open http://localhost:8080/dist/demo1.html
 
 ## Usage
 
+### Creating a Game
+
+Install the engine:
+```bash
+npm install uap-game-engine
+```
+
+Create your game in a `src/` directory:
 ```javascript
+// src/index.js
 import { Game, Entity, Shader, Input } from 'uap-game-engine';
 
 class MyGame extends Entity {
@@ -43,10 +52,29 @@ class MyGame extends Entity {
   }
 }
 
-const game = new Game(document.getElementById('canvas'));
+const canvas = document.getElementById('game');
+const game = new Game(canvas);
 game.add(new MyGame());
 game.start();
 ```
+
+### Building Your Game
+
+Add to your `package.json`:
+```json
+{
+  "scripts": {
+    "build": "uap-build"
+  }
+}
+```
+
+Build your game:
+```bash
+npm run build
+```
+
+This compiles your game from `src/index.js` (and any files it imports) into a single self-contained HTML file at `dist/index.html`.
 
 ## Commands
 
@@ -84,6 +112,6 @@ The `files` field in package.json ensures only `dist/index.js` and `README.md` a
 ## Dependencies
 
 - gl-matrix (3D math)
-- esbuild (build tool, dev only)
+- esbuild (build tool)
 
 See SPEC.md for complete documentation.

@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+IMAGE_TAG=$(echo "local-${PWD##*/}" | tr '[:upper:]' '[:lower:]')
+docker image inspect "$IMAGE_TAG" > /dev/null || docker build docker -t "$IMAGE_TAG"
+docker run --rm --cap-drop=all \
+  -p "8080:8080" \
+  -v "$PWD:/app" \
+  -v "$PWD/docker:/app/docker:ro" \
+  -it $(docker build -q docker -t "$IMAGE_TAG") $@
+
+

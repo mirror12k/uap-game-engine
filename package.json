@@ -1,0 +1,23 @@
+{
+  "name": "uap-game-engine",
+  "version": "1.0.0",
+  "description": "Minimalistic 3D game engine for web browsers",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "preinstall": "node scripts/pre-install.js",
+    "build": "node scripts/check-deps.js && node scripts/build.js",
+    "test": "node scripts/test.js",
+    "server": "python3 -m http.server 8080",
+    "deps": "node scripts/check-deps.js"
+  },
+  "keywords": ["game-engine", "webgl", "3d"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.0"
+  }
+}

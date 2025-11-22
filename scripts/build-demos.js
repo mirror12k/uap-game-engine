@@ -26,6 +26,11 @@ const demos = [
     name: 'Game of Life',
     entry: 'demos/game-of-life/index.js',
     output: 'dist/demo5.html'
+  },
+  {
+    name: 'Game of Life 3D',
+    entry: 'demos/game-of-life-3d/index.js',
+    output: 'dist/demo6.html'
   }
 ];
 

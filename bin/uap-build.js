@@ -1,7 +1,30 @@
 #!/usr/bin/env node
 import esbuild from 'esbuild';
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
-import { resolve } from 'path';
+import { writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync } from 'fs';
+import { resolve, dirname, basename, extname } from 'path';
+
+function findAssets(entryPoint) {
+  const dir = dirname(entryPoint);
+  const assets = {};
+
+  if (!existsSync(dir)) return assets;
+
+  const files = readdirSync(dir);
+  for (const file of files) {
+    const ext = extname(file).toLowerCase();
+    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.gif') {
+      const filePath = resolve(dir, file);
+      const data = readFileSync(filePath);
+      const base64 = data.toString('base64');
+      const mimeType = ext === '.png' ? 'image/png' :
+                       ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' :
+                       'image/gif';
+      assets[file] = `data:${mimeType};base64,${base64}`;
+    }
+  }
+
+  return assets;
+}
 
 async function buildGame(entryPoint, outputPath, gameName) {
   const result = await esbuild.build({
@@ -14,6 +37,12 @@ async function buildGame(entryPoint, outputPath, gameName) {
   });
 
   const js = result.outputFiles[0].text;
+
+  // Find and embed assets
+  const assets = findAssets(entryPoint);
+  const assetScript = Object.keys(assets).length > 0
+    ? `<script>window.GAME_ASSETS = ${JSON.stringify(assets)};</script>`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html>
@@ -28,12 +57,16 @@ async function buildGame(entryPoint, outputPath, gameName) {
 </head>
 <body>
   <canvas id="game"></canvas>
+  ${assetScript}
   <script>${js}</script>
 </body>
 </html>`;
 
   writeFileSync(outputPath, html);
   console.log(`Built game -> ${outputPath}`);
+  if (Object.keys(assets).length > 0) {
+    console.log(`Embedded ${Object.keys(assets).length} asset(s): ${Object.keys(assets).join(', ')}`);
+  }
 }
 
 function parseArgs() {

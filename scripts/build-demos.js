@@ -16,6 +16,11 @@ const demos = [
     name: 'Box Room',
     entry: 'demos/box-room/index.js',
     output: 'dist/demo3.html'
+  },
+  {
+    name: 'Block Game',
+    entry: 'demos/block-game/index.js',
+    output: 'dist/demo4.html'
   }
 ];
 

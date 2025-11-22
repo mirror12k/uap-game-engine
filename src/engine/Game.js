@@ -6,6 +6,7 @@ export class Game {
     this.frameTime = 1000 / targetFps;
     this.lastTime = 0;
     this.entities = [];
+    this.camera = null;
     this.running = false;
     this.timers = [];
 
@@ -31,6 +32,15 @@ export class Game {
   remove(entity) {
     const idx = this.entities.indexOf(entity);
     if (idx >= 0) this.entities.splice(idx, 1);
+  }
+
+  setCamera(camera) {
+    this.camera = camera;
+    if (camera.init) camera.init(this);
+    // Add camera to entities if it has update or render methods
+    if (camera.update || camera.render) {
+      this.entities.push(camera);
+    }
   }
 
   after(seconds, callback) {

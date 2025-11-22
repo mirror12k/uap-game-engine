@@ -1,4 +1,6 @@
 import { TestRunner, assert, assertEqual, assertApprox } from '../src/engine/TestRunner.js';
+import { runner as cameraTests } from '../tests/Camera.test.js';
+import { runner as shaderManagerTests } from '../tests/ShaderManager.test.js';
 
 const runner = new TestRunner();
 
@@ -65,4 +67,20 @@ runner.test('Only direct dependencies counted', async () => {
   assert(directCount <= 12, 'Only direct dependencies should count toward limit');
 });
 
-runner.run();
+// Run all test suites
+(async () => {
+  console.log('=================================');
+  console.log('Running Camera Tests');
+  console.log('=================================\n');
+  await cameraTests.run();
+
+  console.log('\n=================================');
+  console.log('Running ShaderManager Tests');
+  console.log('=================================\n');
+  await shaderManagerTests.run();
+
+  console.log('\n=================================');
+  console.log('Running General Tests');
+  console.log('=================================\n');
+  await runner.run();
+})();

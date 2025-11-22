@@ -1,4 +1,4 @@
-import { Game, Entity, Shader, Input, mat4 } from '../../src/index.js';
+import { Game, Entity, ShaderManager, Input, mat4 } from '../../src/index.js';
 
 class MouseTriangle extends Entity {
   init(game) {
@@ -7,7 +7,7 @@ class MouseTriangle extends Entity {
 
     this.input = new Input();
 
-    this.shader = new Shader(gl, `
+    this.shader = ShaderManager.getShader(gl, `
       attribute vec3 position;
       uniform mat4 model;
       uniform mat4 projection;

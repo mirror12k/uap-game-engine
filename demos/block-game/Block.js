@@ -1,4 +1,4 @@
-import { Entity, Shader, mat4 } from '../../src/index.js';
+import { Entity, ShaderManager, mat4 } from '../../src/index.js';
 
 export class BlockRenderer extends Entity {
   constructor(texture, blocks) {
@@ -12,7 +12,7 @@ export class BlockRenderer extends Entity {
     super.init(game);
     const gl = game.gl;
 
-    this.shader = new Shader(gl, `
+    this.shader = ShaderManager.getShader(gl, `
       attribute vec3 position;
       attribute vec2 texCoord;
       attribute vec3 color;

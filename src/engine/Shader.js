@@ -80,3 +80,37 @@ export class Shader {
     }
   }
 }
+
+export class ShaderManager {
+  static cache = new Map();
+
+  static generateKey(vertexSource, fragmentSource) {
+    // Simple hash function for cache key generation
+    let hash = 0;
+    const combined = vertexSource + fragmentSource;
+    for (let i = 0; i < combined.length; i++) {
+      const char = combined.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash.toString(36);
+  }
+
+  static getShader(gl, vertexSource, fragmentSource) {
+    const key = this.generateKey(vertexSource, fragmentSource);
+
+    if (!this.cache.has(key)) {
+      this.cache.set(key, new Shader(gl, vertexSource, fragmentSource));
+    }
+
+    return this.cache.get(key);
+  }
+
+  static clear() {
+    this.cache.clear();
+  }
+
+  static getCacheSize() {
+    return this.cache.size;
+  }
+}

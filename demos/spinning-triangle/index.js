@@ -1,11 +1,11 @@
-import { Game, Entity, Shader, mat4 } from '../../src/index.js';
+import { Game, Entity, ShaderManager, mat4 } from '../../src/index.js';
 
 class SpinningTriangle extends Entity {
   init(game) {
     super.init(game);
     const gl = game.gl;
 
-    this.shader = new Shader(gl, `
+    this.shader = ShaderManager.getShader(gl, `
       attribute vec3 position;
       attribute vec3 color;
       uniform mat4 model;

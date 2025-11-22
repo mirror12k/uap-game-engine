@@ -15,6 +15,9 @@
   "scripts": {
     "build": "node scripts/check-deps.js && node scripts/build.js",
     "test": "node scripts/test.js",
+    "test:demos": "node scripts/test-demos-static.js",
+    "test:browser": "node scripts/test-demos-browser.js",
+    "test:all": "npm test && npm run test:demos",
     "server": "python3 -m http.server 8080",
     "deps": "node scripts/check-deps.js"
   },
@@ -30,7 +33,10 @@
   "homepage": "https://github.com/mirror12k/uap-game-engine",
   "license": "MIT",
   "dependencies": {
-    "gl-matrix": "^3.4.3",
-    "esbuild": "^0.19.0"
+    "esbuild": "^0.19.0",
+    "gl-matrix": "^3.4.3"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.31.0"
   }
 }

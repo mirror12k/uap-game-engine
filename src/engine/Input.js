@@ -17,7 +17,8 @@ const KEY_MAP = {
 export class Input {
   constructor() {
     this.keys = {};
-    this.mouse = { x: 0, y: 0, buttons: {} };
+    this.previousKeys = {};
+    this.mouse = { x: 0, y: 0, buttons: {}, previousButtons: {} };
 
     window.addEventListener('keydown', (e) => {
       const name = KEY_MAP[e.code] || e.code;
@@ -43,8 +44,24 @@ export class Input {
     });
   }
 
+  update() {
+    // Update previous key states for edge detection
+    this.previousKeys = { ...this.keys };
+
+    // Update previous mouse button states
+    this.mouse.previousButtons = { ...this.mouse.buttons };
+  }
+
   isKeyDown(key) {
     return !!this.keys[key];
+  }
+
+  isKeyPressed(key) {
+    return !!this.keys[key] && !this.previousKeys[key];
+  }
+
+  isKeyReleased(key) {
+    return !this.keys[key] && !!this.previousKeys[key];
   }
 
   getMousePosition() {
@@ -53,5 +70,13 @@ export class Input {
 
   isMouseButtonDown(button = 0) {
     return !!this.mouse.buttons[button];
+  }
+
+  isMouseButtonPressed(button = 0) {
+    return !!this.mouse.buttons[button] && !this.mouse.previousButtons[button];
+  }
+
+  isMouseButtonReleased(button = 0) {
+    return !this.mouse.buttons[button] && !!this.mouse.previousButtons[button];
   }
 }

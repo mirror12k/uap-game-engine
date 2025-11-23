@@ -1,3 +1,6 @@
+import { Input } from './Input.js';
+import { AudioManager } from './AudioManager.js';
+
 export class Game {
   constructor(canvas, targetFps = 60) {
     this.canvas = canvas;
@@ -9,6 +12,10 @@ export class Game {
     this.camera = null;
     this.running = false;
     this.timers = [];
+
+    // Initialize Input and AudioManager as member variables
+    this.input = new Input();
+    this.audio = new AudioManager();
 
     this.setupResize();
   }
@@ -87,6 +94,8 @@ export class Game {
     for (const entity of this.entities) {
       if (entity.update) entity.update(delta);
     }
+    // Update input states at the end of the frame for edge detection
+    this.input.update();
   }
 
   render() {

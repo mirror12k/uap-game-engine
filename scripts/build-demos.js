@@ -51,6 +51,11 @@ const demos = [
     name: 'Metaballs',
     entry: 'demos/metaballs/index.js',
     output: 'dist/demo10.html'
+  },
+  {
+    name: 'Piano',
+    entry: 'demos/piano/index.js',
+    output: 'dist/demo11.html'
   }
 ];
 

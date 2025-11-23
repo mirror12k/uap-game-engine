@@ -41,6 +41,16 @@ const demos = [
     name: 'Simplex Noise',
     entry: 'demos/simplex-noise/index.js',
     output: 'dist/demo8.html'
+  },
+  {
+    name: 'Fisheye Lens',
+    entry: 'demos/fisheye-lense-demo/index.js',
+    output: 'dist/demo9.html'
+  },
+  {
+    name: 'Metaballs',
+    entry: 'demos/metaballs/index.js',
+    output: 'dist/demo10.html'
   }
 ];
 

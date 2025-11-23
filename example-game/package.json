@@ -1,0 +1,13 @@
+{
+  "name": "example-game",
+  "version": "1.0.0",
+  "description": "Test game using uap-game-engine",
+  "type": "module",
+  "scripts": {
+    "build": "uap-build",
+    "server": "python3 -m http.server 8080"
+  },
+  "dependencies": {
+    "uap-game-engine": "^1.0.2"
+  }
+}

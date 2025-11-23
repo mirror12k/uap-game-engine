@@ -36,6 +36,11 @@ const demos = [
     name: 'Physics Demo',
     entry: 'demos/physics-demo/index.js',
     output: 'dist/demo7.html'
+  },
+  {
+    name: 'Simplex Noise',
+    entry: 'demos/simplex-noise/index.js',
+    output: 'dist/demo8.html'
   }
 ];
 

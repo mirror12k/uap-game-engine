@@ -37,6 +37,7 @@
     "gl-matrix": "^3.4.3"
   },
   "devDependencies": {
+    "matter-js": "^0.20.0",
     "puppeteer": "^24.31.0"
   }
 }

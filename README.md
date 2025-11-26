@@ -22,7 +22,6 @@ Open http://localhost:8080/dist/demo1.html
 - Async timer system
 - Auto-resizing canvas
 - Custom test suite (zero test dependencies)
-- 12 dependency hard limit (currently 2)
 
 ## Usage
 

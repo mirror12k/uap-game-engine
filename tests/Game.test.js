@@ -1,4 +1,4 @@
-import { TestRunner, assert, assertEqual } from '../src/engine/TestRunner.js';
+import { TestRunner, assert, assertEqual, assertApprox } from '../src/engine/TestRunner.js';
 import { Game } from '../src/engine/Game.js';
 
 const runner = new TestRunner();
@@ -299,6 +299,40 @@ runner.test('Game: clearing one timer does not affect others', () => {
   game.updateTimers(0.1);
   assertEqual(count1, 1); // Should not increase
   assertEqual(count2, 2); // Should continue
+});
+
+// ============================
+// Game Initialization Tests
+// ============================
+
+runner.test('Game: initializes with correct FPS', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  assertEqual(game.targetFps, 60);
+  assertApprox(game.frameTime, 16.666, 0.01);
+});
+
+runner.test('Game: can add entity', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+  const entity = { init: () => {} };
+
+  game.add(entity);
+  assertEqual(game.entities.length, 1);
+});
+
+runner.test('Game: timer countdown works correctly', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  const timer = { time: 1.5, callback: () => {}, repeat: false };
+  game.timers.push(timer);
+
+  const delta = 0.5;
+  game.updateTimers(delta);
+
+  assertApprox(timer.time, 1.0, 0.01);
 });
 
 export { runner };

@@ -51,7 +51,20 @@ export class Game {
   }
 
   after(seconds, callback) {
-    this.timers.push({ time: seconds, callback });
+    const timer = { time: seconds, callback, repeat: false };
+    this.timers.push(timer);
+    return timer;
+  }
+
+  every(seconds, callback) {
+    const timer = { time: seconds, interval: seconds, callback, repeat: true };
+    this.timers.push(timer);
+    return timer;
+  }
+
+  clearEvent(timer) {
+    const idx = this.timers.indexOf(timer);
+    if (idx >= 0) this.timers.splice(idx, 1);
   }
 
   start() {
@@ -82,10 +95,21 @@ export class Game {
 
   updateTimers(delta) {
     for (let i = this.timers.length - 1; i >= 0; i--) {
-      this.timers[i].time -= delta;
-      if (this.timers[i].time <= 0) {
-        this.timers[i].callback();
-        this.timers.splice(i, 1);
+      const timer = this.timers[i];
+      timer.time -= delta;
+      if (timer.time <= 0) {
+        timer.callback();
+        // Check if timer still exists (might have been cleared in callback)
+        const timerStillExists = this.timers[i] === timer;
+        if (timerStillExists) {
+          if (timer.repeat) {
+            // Reset timer for repeating timers, accounting for overflow
+            timer.time = timer.interval + timer.time;
+          } else {
+            // Remove one-time timers
+            this.timers.splice(i, 1);
+          }
+        }
       }
     }
   }

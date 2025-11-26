@@ -1,6 +1,7 @@
 import { TestRunner, assert, assertEqual, assertApprox } from '../src/engine/TestRunner.js';
 import { runner as cameraTests } from '../tests/Camera.test.js';
 import { runner as shaderManagerTests } from '../tests/ShaderManager.test.js';
+import { runner as gameTests } from '../tests/Game.test.js';
 
 const runner = new TestRunner();
 
@@ -78,6 +79,11 @@ runner.test('Only direct dependencies counted', async () => {
   console.log('Running ShaderManager Tests');
   console.log('=================================\n');
   await shaderManagerTests.run();
+
+  console.log('\n=================================');
+  console.log('Running Game Timer Tests');
+  console.log('=================================\n');
+  await gameTests.run();
 
   console.log('\n=================================');
   console.log('Running General Tests');

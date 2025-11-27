@@ -335,4 +335,253 @@ runner.test('Game: timer countdown works correctly', () => {
   assertApprox(timer.time, 1.0, 0.01);
 });
 
+// ============================
+// Timer Tests - until()
+// ============================
+
+runner.test('Game: until() executes callback until condition is met', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let count = 0;
+  game.until(() => count >= 5, () => {
+    count++;
+  });
+
+  // Should execute on first update
+  game.updateTimers(0.016);
+  assertEqual(count, 1);
+
+  // Continue executing
+  game.updateTimers(0.016);
+  assertEqual(count, 2);
+
+  game.updateTimers(0.016);
+  assertEqual(count, 3);
+
+  game.updateTimers(0.016);
+  assertEqual(count, 4);
+
+  game.updateTimers(0.016);
+  assertEqual(count, 5);
+
+  // Should stop executing after condition is met
+  game.updateTimers(0.016);
+  assertEqual(count, 5);
+});
+
+runner.test('Game: until() passes delta to callback', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let receivedDelta = 0;
+  let count = 0;
+  game.until(() => count >= 1, (delta) => {
+    receivedDelta = delta;
+    count++;
+  });
+
+  game.updateTimers(0.5);
+  assertEqual(count, 1);
+  assertApprox(receivedDelta, 0.5, 0.01);
+});
+
+runner.test('Game: until() removes timer when condition is true', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let executed = false;
+  game.until(() => true, () => {
+    executed = true;
+  });
+
+  const initialTimerCount = game.timers.length;
+  game.updateTimers(0.016);
+
+  // Timer should be removed
+  assertEqual(game.timers.length, initialTimerCount - 1);
+});
+
+runner.test('Game: until() can be cleared with clearEvent()', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let count = 0;
+  const timer = game.until(() => count >= 10, () => {
+    count++;
+  });
+
+  game.updateTimers(0.016);
+  assertEqual(count, 1);
+
+  // Clear the timer
+  game.clearEvent(timer);
+
+  // Should not execute anymore
+  game.updateTimers(0.016);
+  assertEqual(count, 1);
+});
+
+// ============================
+// Timer Tests - continuous()
+// ============================
+
+runner.test('Game: continuous() executes callback every frame', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let count = 0;
+  game.continuous(() => {
+    count++;
+  });
+
+  game.updateContinuous(0.016);
+  assertEqual(count, 1);
+
+  game.updateContinuous(0.016);
+  assertEqual(count, 2);
+
+  game.updateContinuous(0.016);
+  assertEqual(count, 3);
+});
+
+runner.test('Game: continuous() passes delta to callback', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let receivedDelta = 0;
+  game.continuous((delta) => {
+    receivedDelta = delta;
+  });
+
+  game.updateContinuous(0.123);
+  assertApprox(receivedDelta, 0.123, 0.001);
+});
+
+runner.test('Game: continuous() can be stopped with clearEvent()', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let count = 0;
+  const handle = game.continuous(() => {
+    count++;
+  });
+
+  game.updateContinuous(0.016);
+  assertEqual(count, 1);
+
+  game.updateContinuous(0.016);
+  assertEqual(count, 2);
+
+  // Clear the continuous callback
+  game.clearEvent(handle);
+
+  // Should not execute anymore
+  game.updateContinuous(0.016);
+  assertEqual(count, 2);
+});
+
+runner.test('Game: continuous() returns a handle', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  const handle = game.continuous(() => {});
+
+  assert(handle !== undefined);
+  assert(handle !== null);
+  assert(typeof handle === 'object');
+});
+
+runner.test('Game: multiple continuous callbacks work independently', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  let count1 = 0;
+  let count2 = 0;
+
+  const handle1 = game.continuous(() => { count1++; });
+  const handle2 = game.continuous(() => { count2++; });
+
+  game.updateContinuous(0.016);
+  assertEqual(count1, 1);
+  assertEqual(count2, 1);
+
+  // Clear only first one
+  game.clearEvent(handle1);
+
+  game.updateContinuous(0.016);
+  assertEqual(count1, 1); // Should not increase
+  assertEqual(count2, 2); // Should continue
+});
+
+// ============================
+// clearEvent() warning tests
+// ============================
+
+runner.test('Game: clearEvent() warns when removing non-existent event', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  // Mock console.warn to capture the warning
+  const originalWarn = console.warn;
+  let warnCalled = false;
+  console.warn = (msg) => {
+    if (msg.includes('clearEvent')) {
+      warnCalled = true;
+    }
+  };
+
+  // Try to clear a non-existent timer
+  game.clearEvent({ fake: 'timer' });
+
+  // Restore console.warn
+  console.warn = originalWarn;
+
+  assertEqual(warnCalled, true);
+});
+
+runner.test('Game: clearEvent() does not warn when removing valid timer', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  const timer = game.after(1.0, () => {});
+
+  // Mock console.warn to capture any warnings
+  const originalWarn = console.warn;
+  let warnCalled = false;
+  console.warn = () => {
+    warnCalled = true;
+  };
+
+  // Clear valid timer
+  game.clearEvent(timer);
+
+  // Restore console.warn
+  console.warn = originalWarn;
+
+  assertEqual(warnCalled, false);
+});
+
+runner.test('Game: clearEvent() does not warn when removing valid continuous callback', () => {
+  const canvas = createMockCanvas();
+  const game = new Game(canvas);
+
+  const handle = game.continuous(() => {});
+
+  // Mock console.warn to capture any warnings
+  const originalWarn = console.warn;
+  let warnCalled = false;
+  console.warn = () => {
+    warnCalled = true;
+  };
+
+  // Clear valid continuous callback
+  game.clearEvent(handle);
+
+  // Restore console.warn
+  console.warn = originalWarn;
+
+  assertEqual(warnCalled, false);
+});
+
 export { runner };

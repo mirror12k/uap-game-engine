@@ -12,6 +12,7 @@ export class Game {
     this.camera = null;
     this.running = false;
     this.timers = [];
+    this.continuousCallbacks = [];
 
     // Initialize Input and AudioManager as member variables
     this.input = new Input();
@@ -62,9 +63,33 @@ export class Game {
     return timer;
   }
 
+  until(condition, callback) {
+    const timer = { time: 0, interval: 0, condition, callback, repeat: true, checkCondition: true };
+    this.timers.push(timer);
+    return timer;
+  }
+
+  continuous(callback) {
+    const handle = { callback };
+    this.continuousCallbacks.push(handle);
+    return handle;
+  }
+
   clearEvent(timer) {
-    const idx = this.timers.indexOf(timer);
-    if (idx >= 0) this.timers.splice(idx, 1);
+    // Check if it's a timer
+    const timerIdx = this.timers.indexOf(timer);
+    if (timerIdx >= 0) {
+      this.timers.splice(timerIdx, 1);
+      return;
+    }
+    // Check if it's a continuous callback
+    const continuousIdx = this.continuousCallbacks.indexOf(timer);
+    if (continuousIdx >= 0) {
+      this.continuousCallbacks.splice(continuousIdx, 1);
+      return;
+    }
+    // Nothing was found to remove
+    console.warn('clearEvent: No matching timer or continuous callback found to remove');
   }
 
   start() {
@@ -81,7 +106,7 @@ export class Game {
     if (!this.running) return;
 
     const now = performance.now();
-    const delta = (now - this.lastTime) / 1000;
+    const delta = Math.min((now - this.lastTime) / 1000, 0.1);
 
     if (now - this.lastTime >= this.frameTime) {
       this.update(delta);
@@ -90,15 +115,31 @@ export class Game {
     }
 
     this.updateTimers(delta);
+    this.updateContinuous(delta);
     requestAnimationFrame(() => this.loop());
   }
 
   updateTimers(delta) {
     for (let i = this.timers.length - 1; i >= 0; i--) {
       const timer = this.timers[i];
+
+      // Handle until() timers with condition checking
+      if (timer.checkCondition) {
+        // Check if condition is met
+        if (timer.condition()) {
+          // Condition met, remove timer
+          this.timers.splice(i, 1);
+          continue;
+        }
+        // Execute callback every frame until condition is met
+        timer.callback(delta);
+        continue;
+      }
+
+      // Handle regular timers (after/every)
       timer.time -= delta;
       if (timer.time <= 0) {
-        timer.callback();
+        timer.callback(delta);
         // Check if timer still exists (might have been cleared in callback)
         const timerStillExists = this.timers[i] === timer;
         if (timerStillExists) {
@@ -111,6 +152,12 @@ export class Game {
           }
         }
       }
+    }
+  }
+
+  updateContinuous(delta) {
+    for (const handle of this.continuousCallbacks) {
+      handle.callback(delta);
     }
   }
 
